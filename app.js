@@ -16,6 +16,25 @@ var uiController = (function() {
     },
     getDOMstrings: function() {
       return DOMstrings;
+    },
+    addListItem: function(item, type) {
+      //Орлого зарлагын элементийг агуулсан html - г бэлтгэнэ.
+      var html, list;
+      if (type === "inc") {
+        list = ".income__list";
+        html =
+          '<div class="item clearfix" id="income-%id%"><div class="item__description">$$DESCRIPTION$$</div><div class="right clearfix"><div class="item__value">$$VALUE$$</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button> </div></div></div>';
+      } else {
+        list = ".expenses__list";
+        html =
+          ' <div class="item clearfix" id="expense-%id%"><div class="item__description">$$DESCRIPTION$$</div><div class="right clearfix"><div class="item__value">$$VALUE$$</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+      }
+      //Тэр html дотроо орлого зарлагын утгуудыг REPLACE ашиглан өөрчилж өгнө.
+      html = html.replace("%id%", item.id);
+      html = html.replace("$$DESCRIPTION$$", item.description);
+      html = html.replace("$$VALUE$$", item.value);
+      //Бэлтгэсэг html ээ DOM руу хийж өгнө.
+      document.querySelector(list).insertAdjacentHTML("beforeend", html);
     }
   };
 })();
@@ -32,7 +51,7 @@ var financeController = (function() {
     this.value = value;
   };
   var data = {
-    allItems: {
+    items: {
       inc: [],
       exp: []
     },
@@ -41,14 +60,38 @@ var financeController = (function() {
       exp: 0
     }
   };
+  return {
+    addItems: function(type, desc, val) {
+      var item, id;
+      if (data.items[type].length === 0) {
+        id = 1;
+      } else {
+        id = data.items[type][data.items[type].length - 1].id + 1;
+      }
+      //idenfication
+      if (type === "inc") {
+        item = new Income(id, desc, val);
+      } else {
+        item = new Income(id, desc, val);
+      }
+      data.items[type].push(item);
+      return item;
+    }
+  };
 })();
 //Controller that connects app
 var appController = (function(uiController, financeController) {
   var ctrlAddItem = function() {
     //1. get datas from desktop
-    console.log(uiController.getInput());
+    var input = uiController.getInput();
     //2. Transfer datas that gathered from desktop to financeController and save there.
+    var item = financeController.addItems(
+      input.type,
+      input.description,
+      input.value
+    );
     //3. display datas that gathered on web properly.
+    uiController.addListItem(item, input.type);
     //4. Calculate finance
     //5. Display a calculated data in web.
   };
