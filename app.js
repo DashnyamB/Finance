@@ -13,7 +13,7 @@ var uiController = (function() {
       return {
         type: document.querySelector(DOMstrings.inputType).value,
         description: document.querySelector(DOMstrings.inputDescription).value,
-        value: document.querySelector(DOMstrings.inputValue).value
+        value: parseInt(document.querySelector(DOMstrings.inputValue).value)
       };
     },
     getDOMstrings: function() {
@@ -100,17 +100,19 @@ var appController = (function(uiController, financeController) {
   var ctrlAddItem = function() {
     //1. get datas from desktop
     var input = uiController.getInput();
-    //2. Transfer datas that gathered from desktop to financeController and save there.
-    var item = financeController.addItems(
-      input.type,
-      input.description,
-      input.value
-    );
-    //3. display datas that gathered on web properly.
-    uiController.addListItem(item, input.type);
-    uiController.clearFields();
-    //4. Calculate finance
-    //5. Display a calculated data in web.
+    if (input.description !== "" && input.value !== "") {
+      //2. Transfer datas that gathered from desktop to financeController and save there.
+      var item = financeController.addItems(
+        input.type,
+        input.description,
+        input.value
+      );
+      //3. display datas that gathered on web properly.
+      uiController.addListItem(item, input.type);
+      uiController.clearFields();
+      //4. Calculate finance
+      //5. Display a calculated data in web.
+    }
   };
   var setUpEventListener = function() {
     var DOM = uiController.getDOMstrings();
